@@ -1,0 +1,1080 @@
+[
+  {
+    "paletteName": "red",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fef2f2"
+      },
+      {
+        "name": "100",
+        "color": "#ffe2e2"
+      },
+      {
+        "name": "200",
+        "color": "#ffc9c9"
+      },
+      {
+        "name": "300",
+        "color": "#ffa2a2"
+      },
+      {
+        "name": "400",
+        "color": "#ff6467"
+      },
+      {
+        "name": "500",
+        "color": "#fb2c36"
+      },
+      {
+        "name": "600",
+        "color": "#e7000b"
+      },
+      {
+        "name": "700",
+        "color": "#c10007"
+      },
+      {
+        "name": "800",
+        "color": "#9f0712"
+      },
+      {
+        "name": "900",
+        "color": "#82181a"
+      },
+      {
+        "name": "950",
+        "color": "#460809"
+      }
+    ]
+  },
+  {
+    "paletteName": "orange",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fff7ed"
+      },
+      {
+        "name": "100",
+        "color": "#ffedd4"
+      },
+      {
+        "name": "200",
+        "color": "#ffd6a7"
+      },
+      {
+        "name": "300",
+        "color": "#ffb86a"
+      },
+      {
+        "name": "400",
+        "color": "#ff8904"
+      },
+      {
+        "name": "500",
+        "color": "#f97200"
+      },
+      {
+        "name": "600",
+        "color": "#e55b00"
+      },
+      {
+        "name": "700",
+        "color": "#c23f00"
+      },
+      {
+        "name": "800",
+        "color": "#9f2d00"
+      },
+      {
+        "name": "900",
+        "color": "#7e2a0c"
+      },
+      {
+        "name": "950",
+        "color": "#441306"
+      }
+    ]
+  },
+  {
+    "paletteName": "amber",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fffbeb"
+      },
+      {
+        "name": "100",
+        "color": "#fef3c6"
+      },
+      {
+        "name": "200",
+        "color": "#fee685"
+      },
+      {
+        "name": "300",
+        "color": "#ffd230"
+      },
+      {
+        "name": "400",
+        "color": "#fcba00"
+      },
+      {
+        "name": "500",
+        "color": "#f69d00"
+      },
+      {
+        "name": "600",
+        "color": "#d87700"
+      },
+      {
+        "name": "700",
+        "color": "#b55100"
+      },
+      {
+        "name": "800",
+        "color": "#973c00"
+      },
+      {
+        "name": "900",
+        "color": "#7b3306"
+      },
+      {
+        "name": "950",
+        "color": "#461901"
+      }
+    ]
+  },
+  {
+    "paletteName": "yellow",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fefce8"
+      },
+      {
+        "name": "100",
+        "color": "#fef9c2"
+      },
+      {
+        "name": "200",
+        "color": "#fff085"
+      },
+      {
+        "name": "300",
+        "color": "#ffdf20"
+      },
+      {
+        "name": "400",
+        "color": "#fbc800"
+      },
+      {
+        "name": "500",
+        "color": "#edb200"
+      },
+      {
+        "name": "600",
+        "color": "#cc8900"
+      },
+      {
+        "name": "700",
+        "color": "#a36100"
+      },
+      {
+        "name": "800",
+        "color": "#894b00"
+      },
+      {
+        "name": "900",
+        "color": "#733e0a"
+      },
+      {
+        "name": "950",
+        "color": "#432004"
+      }
+    ]
+  },
+  {
+    "paletteName": "lime",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f7fee7"
+      },
+      {
+        "name": "100",
+        "color": "#ecfcca"
+      },
+      {
+        "name": "200",
+        "color": "#d8f999"
+      },
+      {
+        "name": "300",
+        "color": "#bbf451"
+      },
+      {
+        "name": "400",
+        "color": "#9ae600"
+      },
+      {
+        "name": "500",
+        "color": "#83cd00"
+      },
+      {
+        "name": "600",
+        "color": "#64a400"
+      },
+      {
+        "name": "700",
+        "color": "#497d00"
+      },
+      {
+        "name": "800",
+        "color": "#3c6300"
+      },
+      {
+        "name": "900",
+        "color": "#35530e"
+      },
+      {
+        "name": "950",
+        "color": "#192e03"
+      }
+    ]
+  },
+  {
+    "paletteName": "green",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f0fdf4"
+      },
+      {
+        "name": "100",
+        "color": "#dcfce7"
+      },
+      {
+        "name": "200",
+        "color": "#b9f8cf"
+      },
+      {
+        "name": "300",
+        "color": "#7bf1a8"
+      },
+      {
+        "name": "400",
+        "color": "#05df72"
+      },
+      {
+        "name": "500",
+        "color": "#00c950"
+      },
+      {
+        "name": "600",
+        "color": "#00a63e"
+      },
+      {
+        "name": "700",
+        "color": "#008236"
+      },
+      {
+        "name": "800",
+        "color": "#016630"
+      },
+      {
+        "name": "900",
+        "color": "#0d542b"
+      },
+      {
+        "name": "950",
+        "color": "#032e15"
+      }
+    ]
+  },
+  {
+    "paletteName": "emerald",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#ecfdf5"
+      },
+      {
+        "name": "100",
+        "color": "#d0fae5"
+      },
+      {
+        "name": "200",
+        "color": "#a4f4cf"
+      },
+      {
+        "name": "300",
+        "color": "#5ee9b5"
+      },
+      {
+        "name": "400",
+        "color": "#00d492"
+      },
+      {
+        "name": "500",
+        "color": "#00bc7d"
+      },
+      {
+        "name": "600",
+        "color": "#009966"
+      },
+      {
+        "name": "700",
+        "color": "#007a55"
+      },
+      {
+        "name": "800",
+        "color": "#006045"
+      },
+      {
+        "name": "900",
+        "color": "#004f3b"
+      },
+      {
+        "name": "950",
+        "color": "#002c22"
+      }
+    ]
+  },
+  {
+    "paletteName": "teal",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f0fdfa"
+      },
+      {
+        "name": "100",
+        "color": "#cbfbf1"
+      },
+      {
+        "name": "200",
+        "color": "#96f7e4"
+      },
+      {
+        "name": "300",
+        "color": "#46ecd5"
+      },
+      {
+        "name": "400",
+        "color": "#00d5be"
+      },
+      {
+        "name": "500",
+        "color": "#00bba7"
+      },
+      {
+        "name": "600",
+        "color": "#009689"
+      },
+      {
+        "name": "700",
+        "color": "#00786f"
+      },
+      {
+        "name": "800",
+        "color": "#005f5a"
+      },
+      {
+        "name": "900",
+        "color": "#0b4f4a"
+      },
+      {
+        "name": "950",
+        "color": "#022f2e"
+      }
+    ]
+  },
+  {
+    "paletteName": "cyan",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#ecfeff"
+      },
+      {
+        "name": "100",
+        "color": "#cefafe"
+      },
+      {
+        "name": "200",
+        "color": "#a2f4fd"
+      },
+      {
+        "name": "300",
+        "color": "#53eafd"
+      },
+      {
+        "name": "400",
+        "color": "#00d3f2"
+      },
+      {
+        "name": "500",
+        "color": "#00b8db"
+      },
+      {
+        "name": "600",
+        "color": "#0092b8"
+      },
+      {
+        "name": "700",
+        "color": "#007595"
+      },
+      {
+        "name": "800",
+        "color": "#005f78"
+      },
+      {
+        "name": "900",
+        "color": "#104e64"
+      },
+      {
+        "name": "950",
+        "color": "#053345"
+      }
+    ]
+  },
+  {
+    "paletteName": "sky",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f0f9ff"
+      },
+      {
+        "name": "100",
+        "color": "#dff2fe"
+      },
+      {
+        "name": "200",
+        "color": "#b8e6fe"
+      },
+      {
+        "name": "300",
+        "color": "#74d4ff"
+      },
+      {
+        "name": "400",
+        "color": "#00bcff"
+      },
+      {
+        "name": "500",
+        "color": "#00a6f4"
+      },
+      {
+        "name": "600",
+        "color": "#0084d1"
+      },
+      {
+        "name": "700",
+        "color": "#0069a8"
+      },
+      {
+        "name": "800",
+        "color": "#00598a"
+      },
+      {
+        "name": "900",
+        "color": "#024a70"
+      },
+      {
+        "name": "950",
+        "color": "#052f4a"
+      }
+    ]
+  },
+  {
+    "paletteName": "blue",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#eff6ff"
+      },
+      {
+        "name": "100",
+        "color": "#dbeafe"
+      },
+      {
+        "name": "200",
+        "color": "#bedbff"
+      },
+      {
+        "name": "300",
+        "color": "#8ec5ff"
+      },
+      {
+        "name": "400",
+        "color": "#51a2ff"
+      },
+      {
+        "name": "500",
+        "color": "#2b7fff"
+      },
+      {
+        "name": "600",
+        "color": "#155dfc"
+      },
+      {
+        "name": "700",
+        "color": "#1447e6"
+      },
+      {
+        "name": "800",
+        "color": "#193cb8"
+      },
+      {
+        "name": "900",
+        "color": "#1c398e"
+      },
+      {
+        "name": "950",
+        "color": "#162456"
+      }
+    ]
+  },
+  {
+    "paletteName": "indigo",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#eef2ff"
+      },
+      {
+        "name": "100",
+        "color": "#e0e7ff"
+      },
+      {
+        "name": "200",
+        "color": "#c6d2ff"
+      },
+      {
+        "name": "300",
+        "color": "#a3b3ff"
+      },
+      {
+        "name": "400",
+        "color": "#7c86ff"
+      },
+      {
+        "name": "500",
+        "color": "#615fff"
+      },
+      {
+        "name": "600",
+        "color": "#4f39f6"
+      },
+      {
+        "name": "700",
+        "color": "#432dd7"
+      },
+      {
+        "name": "800",
+        "color": "#372aac"
+      },
+      {
+        "name": "900",
+        "color": "#312c85"
+      },
+      {
+        "name": "950",
+        "color": "#1e1a4d"
+      }
+    ]
+  },
+  {
+    "paletteName": "violet",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f5f3ff"
+      },
+      {
+        "name": "100",
+        "color": "#ede9fe"
+      },
+      {
+        "name": "200",
+        "color": "#ddd6ff"
+      },
+      {
+        "name": "300",
+        "color": "#c4b4ff"
+      },
+      {
+        "name": "400",
+        "color": "#a684ff"
+      },
+      {
+        "name": "500",
+        "color": "#8e51ff"
+      },
+      {
+        "name": "600",
+        "color": "#7f22fe"
+      },
+      {
+        "name": "700",
+        "color": "#7008e7"
+      },
+      {
+        "name": "800",
+        "color": "#5d0ec0"
+      },
+      {
+        "name": "900",
+        "color": "#4d179a"
+      },
+      {
+        "name": "950",
+        "color": "#2f0d68"
+      }
+    ]
+  },
+  {
+    "paletteName": "purple",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#faf5ff"
+      },
+      {
+        "name": "100",
+        "color": "#f3e8ff"
+      },
+      {
+        "name": "200",
+        "color": "#e9d4ff"
+      },
+      {
+        "name": "300",
+        "color": "#dab2ff"
+      },
+      {
+        "name": "400",
+        "color": "#c27aff"
+      },
+      {
+        "name": "500",
+        "color": "#ad46ff"
+      },
+      {
+        "name": "600",
+        "color": "#9810fa"
+      },
+      {
+        "name": "700",
+        "color": "#8200db"
+      },
+      {
+        "name": "800",
+        "color": "#6e11b0"
+      },
+      {
+        "name": "900",
+        "color": "#59168b"
+      },
+      {
+        "name": "950",
+        "color": "#3c0366"
+      }
+    ]
+  },
+  {
+    "paletteName": "fuchsia",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fdf4ff"
+      },
+      {
+        "name": "100",
+        "color": "#fae8ff"
+      },
+      {
+        "name": "200",
+        "color": "#f6cfff"
+      },
+      {
+        "name": "300",
+        "color": "#f4a8ff"
+      },
+      {
+        "name": "400",
+        "color": "#ed6aff"
+      },
+      {
+        "name": "500",
+        "color": "#e12afb"
+      },
+      {
+        "name": "600",
+        "color": "#c800de"
+      },
+      {
+        "name": "700",
+        "color": "#a800b7"
+      },
+      {
+        "name": "800",
+        "color": "#8a0194"
+      },
+      {
+        "name": "900",
+        "color": "#721378"
+      },
+      {
+        "name": "950",
+        "color": "#4b004f"
+      }
+    ]
+  },
+  {
+    "paletteName": "pink",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fdf2f8"
+      },
+      {
+        "name": "100",
+        "color": "#fce7f3"
+      },
+      {
+        "name": "200",
+        "color": "#fccee8"
+      },
+      {
+        "name": "300",
+        "color": "#fda5d5"
+      },
+      {
+        "name": "400",
+        "color": "#fb64b6"
+      },
+      {
+        "name": "500",
+        "color": "#f6339a"
+      },
+      {
+        "name": "600",
+        "color": "#e60076"
+      },
+      {
+        "name": "700",
+        "color": "#c6005c"
+      },
+      {
+        "name": "800",
+        "color": "#a3004c"
+      },
+      {
+        "name": "900",
+        "color": "#861043"
+      },
+      {
+        "name": "950",
+        "color": "#510424"
+      }
+    ]
+  },
+  {
+    "paletteName": "rose",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fff1f2"
+      },
+      {
+        "name": "100",
+        "color": "#ffe4e6"
+      },
+      {
+        "name": "200",
+        "color": "#ffccd3"
+      },
+      {
+        "name": "300",
+        "color": "#ffa1ad"
+      },
+      {
+        "name": "400",
+        "color": "#ff637e"
+      },
+      {
+        "name": "500",
+        "color": "#ff2056"
+      },
+      {
+        "name": "600",
+        "color": "#eb0040"
+      },
+      {
+        "name": "700",
+        "color": "#c60036"
+      },
+      {
+        "name": "800",
+        "color": "#a50036"
+      },
+      {
+        "name": "900",
+        "color": "#8b0836"
+      },
+      {
+        "name": "950",
+        "color": "#4d0218"
+      }
+    ]
+  },
+  {
+    "paletteName": "slate",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f8fafc"
+      },
+      {
+        "name": "100",
+        "color": "#f1f5f9"
+      },
+      {
+        "name": "200",
+        "color": "#e2e8f0"
+      },
+      {
+        "name": "300",
+        "color": "#cad5e2"
+      },
+      {
+        "name": "400",
+        "color": "#90a1b9"
+      },
+      {
+        "name": "500",
+        "color": "#62748e"
+      },
+      {
+        "name": "600",
+        "color": "#45556c"
+      },
+      {
+        "name": "700",
+        "color": "#314158"
+      },
+      {
+        "name": "800",
+        "color": "#1d293d"
+      },
+      {
+        "name": "900",
+        "color": "#0f172b"
+      },
+      {
+        "name": "950",
+        "color": "#020618"
+      }
+    ]
+  },
+  {
+    "paletteName": "gray",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#f9fafb"
+      },
+      {
+        "name": "100",
+        "color": "#f3f4f6"
+      },
+      {
+        "name": "200",
+        "color": "#e5e7eb"
+      },
+      {
+        "name": "300",
+        "color": "#d1d5dc"
+      },
+      {
+        "name": "400",
+        "color": "#99a1af"
+      },
+      {
+        "name": "500",
+        "color": "#6a7282"
+      },
+      {
+        "name": "600",
+        "color": "#4a5565"
+      },
+      {
+        "name": "700",
+        "color": "#364153"
+      },
+      {
+        "name": "800",
+        "color": "#1e2939"
+      },
+      {
+        "name": "900",
+        "color": "#101828"
+      },
+      {
+        "name": "950",
+        "color": "#030712"
+      }
+    ]
+  },
+  {
+    "paletteName": "zinc",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fafafa"
+      },
+      {
+        "name": "100",
+        "color": "#f4f4f5"
+      },
+      {
+        "name": "200",
+        "color": "#e4e4e7"
+      },
+      {
+        "name": "300",
+        "color": "#d4d4d8"
+      },
+      {
+        "name": "400",
+        "color": "#9f9fa9"
+      },
+      {
+        "name": "500",
+        "color": "#71717b"
+      },
+      {
+        "name": "600",
+        "color": "#52525c"
+      },
+      {
+        "name": "700",
+        "color": "#3f3f46"
+      },
+      {
+        "name": "800",
+        "color": "#27272a"
+      },
+      {
+        "name": "900",
+        "color": "#18181b"
+      },
+      {
+        "name": "950",
+        "color": "#09090b"
+      }
+    ]
+  },
+  {
+    "paletteName": "neutral",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fafafa"
+      },
+      {
+        "name": "100",
+        "color": "#f5f5f5"
+      },
+      {
+        "name": "200",
+        "color": "#e5e5e5"
+      },
+      {
+        "name": "300",
+        "color": "#d4d4d4"
+      },
+      {
+        "name": "400",
+        "color": "#a1a1a1"
+      },
+      {
+        "name": "500",
+        "color": "#737373"
+      },
+      {
+        "name": "600",
+        "color": "#525252"
+      },
+      {
+        "name": "700",
+        "color": "#404040"
+      },
+      {
+        "name": "800",
+        "color": "#262626"
+      },
+      {
+        "name": "900",
+        "color": "#171717"
+      },
+      {
+        "name": "950",
+        "color": "#0a0a0a"
+      }
+    ]
+  },
+  {
+    "paletteName": "stone",
+    "swatches": [
+      {
+        "name": "50",
+        "color": "#fafaf9"
+      },
+      {
+        "name": "100",
+        "color": "#f5f5f4"
+      },
+      {
+        "name": "200",
+        "color": "#e7e5e4"
+      },
+      {
+        "name": "300",
+        "color": "#d6d3d1"
+      },
+      {
+        "name": "400",
+        "color": "#a6a09b"
+      },
+      {
+        "name": "500",
+        "color": "#79716b"
+      },
+      {
+        "name": "600",
+        "color": "#57534d"
+      },
+      {
+        "name": "700",
+        "color": "#44403b"
+      },
+      {
+        "name": "800",
+        "color": "#292524"
+      },
+      {
+        "name": "900",
+        "color": "#1c1917"
+      },
+      {
+        "name": "950",
+        "color": "#0c0a09"
+      }
+    ]
+  }
+]
