@@ -2,6 +2,7 @@ package net.murasakiyamaimo;
 
 import org.lwjgl.BufferUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -9,6 +10,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class IOUtil {
+    public static InputStream getResource(String name) {
+        return Application.class.getResourceAsStream("/" + name);
+    }
+
     public static ByteBuffer readResource(String resourceName) throws IOException {
         Path path = Paths.get("src/main/resources/" + resourceName);
         try (SeekableByteChannel fc = Files.newByteChannel(path)) {
