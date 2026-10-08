@@ -1,6 +1,5 @@
 plugins {
     `java-library`
-    id("com.google.osdetector")
 }
 
 val lwjglVersion = "3.3.6"
@@ -16,6 +15,8 @@ dependencies {
         implementation("org.lwjgl:lwjgl$it:$lwjglVersion")
         runtimeOnly("org.lwjgl:lwjgl$it:$lwjglVersion:natives-windows")
     }
+
+    implementation("org.appliedenergistics.yoga:yoga:1.0.0")
 }
 
 java {

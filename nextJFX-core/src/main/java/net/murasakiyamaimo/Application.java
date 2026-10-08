@@ -1,7 +1,7 @@
 package net.murasakiyamaimo;
 
+import org.appliedenergistics.yoga.*;
 import org.jdom2.*;
-import org.jdom2.filter.ContentFilter;
 import org.jdom2.input.SAXBuilder;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -13,6 +13,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -34,25 +36,31 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Application {
     private Settings settings = new Settings();
 
+    private String code;
+
     private ArrayList<Integer> defaultColor = new ArrayList<>();
     private long window;
     private long vg;
     private final ColorPalette colorPalette = new ColorPalette();
-    private final Sizer sizer = new Sizer();
-    private final Stack<Float> currentYstack = new Stack<>();
-    private float currentY;
     private int fbWidth, fbHeight;
-    private int rem = 16;
+    private int rem;
 
     private static final String FONT_NAME = "mplus-1p";
 
     private JFX caller;
-    private final Map<ClickableRegion, Method> clickableElements = new HashMap<>();
+    private final Map<ClickableRegion, MethodInvocation> clickableElements = new HashMap<>(); // 型をMethodInvocationに変更
+    
+    // メソッド検索のキャッシュ
+    private final Map<String, MethodHandle> methodHandleCache = new HashMap<>();
+    private static final Pattern HANDLER_PATTERN = Pattern.compile("(\\w+)(?:\\((.*)\\))?");
+    private static final Pattern ARG_PATTERN = Pattern.compile("(?<=\\s|^)(?:\"[^\"]*\"|'[^']*'|[^,]+?)(?=\\s*($|,))");
 
     private double clickX, clickY;
     private boolean isClicked;
 
     private final SAXBuilder saxBuilder = new SAXBuilder();
+
+    private YogaLayoutEngine layoutEngine;
 
     public void launch(JFX layout, Settings settings) {
         new Application().run(layout, settings);
@@ -61,24 +69,42 @@ public class Application {
     public void run(JFX caller, Settings settings) {
         this.caller = caller;
 
+        code = caller.render();
+
         System.out.println("LWJGL " + Version.getVersion() + "!");
+        System.out.println("Using Yoga Layout for flexbox-based layouts");
 
         this.settings = settings;
 
         defaultColor = this.settings.getDefaultColor();
 
-        currentYstack.push(0f);
-
         init();
-        loop();
+        try {
+            loop();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+        long totalTime = 0;
+
+        for (Long time : times) {
+            totalTime += time;
+        }
+
+        long averageTime = totalTime / times.size();
+        System.out.println(averageTime);
 
         // 終了処理
+        if (layoutEngine != null) {
+            layoutEngine.dispose();
+        }
+
+        nvgDelete(vg); // この行を追加
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
 
         glfwTerminate();
         glfwSetErrorCallback(null).free();
-
     }
 
     private void init() {
@@ -134,6 +160,7 @@ public class Application {
             if (font == -1) {
                 throw new RuntimeException("Could not add font");
             }
+            MemoryUtil.memFree(fontBuffer);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -142,274 +169,367 @@ public class Application {
         glfwShowWindow(window);
     }
 
-    private void div(ArrayList<Integer> rgb, float size, float width, Map<String, Float> radius) {
-        float height = size * rem;
+    private void renderDiv(YogaLayoutEngine.RenderNode node) {
+        String[] bgColor = node.style.bgColor;
+        ArrayList<Integer> rgb = hex2rgb(colorPalette.get(bgColor[1], bgColor[2]));
+
         NVGColor color = create();
         nvgBeginPath(vg);
 
-        final float[] radTopLeft = {0f};
-        final float[] radTopRight = {0f};
-        final float[] radBotRight = {0f};
-        final float[] radBotLeft = {0f};
+        Map<String, Float> radius = node.style.getBorderRadius();
+        float radTopLeft;
+        float radTopRight;
+        float radBotRight;
+        float radBotLeft;
 
-        radius.forEach((key, value) -> {
-            switch (key) {
-                case "all" -> {
-                    radTopLeft[0] = value;
-                    radTopRight[0] = value;
-                    radBotRight[0] = value;
-                    radBotLeft[0] = value;
-                }
-                case "t" -> {
-                    radTopLeft[0] = value;
-                    radTopRight[0] = value;
-                }
-                case "r" -> {
-                    radTopRight[0] = value;
-                    radBotRight[0] = value;
-                }
-                case "b" -> {
-                    radBotLeft[0] = value;
-                    radBotRight[0] = value;
-                }
-                case "l" -> {
-                    radBotLeft[0] = value;
-                    radTopLeft[0] = value;
-                }
-                case "tl" -> radTopLeft[0] = value;
-                case "tr" -> radTopRight[0] = value;
-                case "br" -> radBotRight[0] = value;
-                case "bl" -> radBotLeft[0] = value;
-            }
-        });
+        if (radius.containsKey("all")) {
+            radTopLeft = radTopRight = radBotRight = radBotLeft = radius.get("all");
+        } else {
+            radTopLeft = radius.getOrDefault("tl", 0f);
+            radTopRight = radius.getOrDefault("tr", 0f);
+            radBotRight = radius.getOrDefault("br", 0f);
+            radBotLeft = radius.getOrDefault("bl", 0f);
+        }
 
-        nvgRoundedRectVarying(vg, 0, currentYstack.peek() * rem, width * rem, height, radTopLeft[0] * rem, radTopRight[0] * rem, radBotRight[0] * rem, radBotLeft[0] * rem);
+        nvgRoundedRectVarying(vg, node.x, node.y, node.width, node.height,
+                             radTopLeft, radTopRight, radBotRight, radBotLeft);
         nvgFillColor(vg, nvgRGBAf((float) rgb.get(0) / 255, (float) rgb.get(1) / 255, (float) rgb.get(2) / 255, 1.0f, color));
         nvgFill(vg);
     }
 
-    private void text(ArrayList<Integer> rgb, float size, String literal) {
+    private void renderText(YogaLayoutEngine.RenderNode node) {
+        if (!node.hasText()) return;
+
+        String[] textColor = node.style.textColor;
+        ArrayList<Integer> rgb = hex2rgb(colorPalette.get(textColor[1], textColor[2]));
+        float textSize = node.style.textSize;
+
         NVGColor color = create();
-        nvgFontSize(vg, size * rem);
+        nvgFontSize(vg, textSize * rem);
         nvgFontFace(vg, FONT_NAME);
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
         nvgFillColor(vg, nvgRGBAf((float) rgb.get(0) / 255, (float) rgb.get(1) / 255, (float) rgb.get(2) / 255, 1.0f, color));
-        nvgText(vg, 0, currentYstack.peek() * rem + 9, literal);
+        nvgText(vg, node.x, node.y + 9, node.textContent);
     }
 
-    private void analyze(Content content, float size, String[] textColor) {
-        text(hex2rgb(colorPalette.get(textColor[1], textColor[2])), size, ((Text) content).getText());
+    // MethodInvocation クラスの定義
+    private static class MethodInvocation {
+        private final MethodHandle methodHandle;
+        private final List<String> argumentStrings; // 生の引数文字列
+        private final JFX callerInstance; // メソッドを呼び出すインスタンス
+        private final Object[] preParsedArguments;
+
+        public MethodInvocation(MethodHandle methodHandle, List<String> argumentStrings, JFX callerInstance) {
+            this.methodHandle = methodHandle;
+            this.argumentStrings = argumentStrings;
+            this.callerInstance = callerInstance;
+            this.preParsedArguments = parseArguments(argumentStrings);
+        }
+
+        private Object[] parseArguments(List<String> argumentStrings) {
+            List<Object> actualArguments = new ArrayList<>();
+            actualArguments.add(callerInstance); // 第1引数はレシーバ(this)
+
+            for (String argString : argumentStrings) {
+                argString = argString.trim();
+                if ((argString.startsWith("'") && argString.endsWith("'")) || (argString.startsWith("\"") && argString.endsWith("\""))) {
+                    actualArguments.add(argString.substring(1, argString.length() - 1));
+                } else if (argString.matches("-?\\d+")) {
+                    actualArguments.add(Integer.parseInt(argString));
+                } else if (argString.equalsIgnoreCase("true") || argString.equalsIgnoreCase("false")) {
+                    actualArguments.add(Boolean.parseBoolean(argString));
+                } else {
+                    actualArguments.add(argString);
+                }
+            }
+            return actualArguments.toArray();
+        }
+
+        public void invoke() throws Throwable {
+            methodHandle.invokeWithArguments(preParsedArguments);
+        }
     }
 
-    private void analyze(Content content) {
-        if (content instanceof Element) {
-            Element element = (Element) content;
-            float h = 0,w = (float) fbWidth / rem;
-            String[] parts;
-            String[] bgColor = {"bg", "none", "none"};
-            String[] textColor = {"text", "gray", "900"};
-            Map<String, Float> radius = new HashMap<>();
-            float textSize = 1;
-            if (element.getAttributeValue("className") != null) {
-                for (String css : element.getAttributeValue("className").split("\\s+")) {
-                    if (css.startsWith("bg-")) {
-                        bgColor = css.split("-");
-                    } else if (css.startsWith("text-")) {
-                        parts = css.split("-");
-                        if (parts[1].contains("xl")) {
-                            textSize = sizer.xl2px(parts[1].charAt(0));
-                        } else {
-                            textColor = css.split("-");
-                        }
-                    } else if (css.startsWith("h-")) {
-                        parts = css.split("-");
-                        if (parts[1].equals("screen")) {
-                            h = fbHeight;
-                        } else {
-                            try {
-                                h = Float.parseFloat(parts[1]) / 4;
-                            } catch (NumberFormatException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    } else if (css.startsWith("w-")) {
-                        parts = css.split("-");
-                        if (parts[1].equals("screen")) {
-                            w = (float) fbWidth / rem;
-                        } else {
-                            try {
-                                w = Float.parseFloat(parts[1]) / 4;
-                            } catch (NumberFormatException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    } else if (css.startsWith("rounded-")) {
-                        parts = css.split("-");
-                        switch (parts[1]) {
-                            case "t", "r", "b", "l", "tl", "tr", "br", "bl" -> radius.put(parts[1], sizer.rounded(parts[2]));
-                            default -> radius.put("all", sizer.rounded(parts[1]));
-                        }
-                    }
-                }
+    private MethodHandle findMethodHandle(String methodName, List<Class<?>> parameterTypes) throws NoSuchMethodException, IllegalAccessException {
+        String cacheKey = methodName + parameterTypes.toString();
+        if (methodHandleCache.containsKey(cacheKey)) {
+            return methodHandleCache.get(cacheKey);
+        }
+
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+        Method method = null;
+
+        if (parameterTypes.isEmpty()) {
+            try {
+                method = caller.getClass().getMethod(methodName);
+            } catch (NoSuchMethodException e) {
+                // 引数ありを期待
             }
+        }
 
-            if (h == 0 && textSize != 1) h = textSize;
+        if (method == null) {
+            method = caller.getClass().getMethod(methodName, parameterTypes.toArray(new Class[0]));
+        }
 
-            String onClickHandler = element.getAttributeValue("onClick");
-            if (onClickHandler != null) {
+        MethodHandle handle = lookup.unreflect(method);
+        methodHandleCache.put(cacheKey, handle);
+        return handle;
+    }
+
+    private List<Class<?>> resolveParameterTypes(List<String> argumentStrings) {
+        List<Class<?>> types = new ArrayList<>();
+        for (String argString : argumentStrings) {
+            argString = argString.trim();
+            if ((argString.startsWith("'") && argString.endsWith("'")) || (argString.startsWith("\"") && argString.endsWith("\""))) {
+                types.add(String.class);
+            } else if (argString.matches("-?\\d+")) {
+                types.add(int.class);
+            } else if (argString.equalsIgnoreCase("true") || argString.equalsIgnoreCase("false")) {
+                types.add(boolean.class);
+            } else {
+                types.add(String.class);
+            }
+        }
+        return types;
+    }
+
+    // onClickハンドラ文字列を解析するヘルパーメソッド
+    private MethodInvocation parseClickHandler(String handlerString, JFX callerInstance) throws NoSuchMethodException, IllegalAccessException {
+        // ラムダ式のような "{...}" 形式をチェック
+        if (handlerString.startsWith("{") && handlerString.endsWith("}")) {
+            throw new UnsupportedOperationException("Lambda expressions are not yet supported for onClick: " + handlerString);
+        }
+
+        // "=>" 形式の解析 (もしあれば)
+        String cleanedHandlerString = handlerString.trim();
+        if (cleanedHandlerString.startsWith("=>")) {
+            cleanedHandlerString = cleanedHandlerString.substring(2).trim();
+        }
+
+        Matcher matcher = HANDLER_PATTERN.matcher(cleanedHandlerString);
+
+        if (matcher.matches()) {
+            String methodName = matcher.group(1);
+            String argsString = matcher.group(2);
+            List<String> arguments = new ArrayList<>();
+            List<Class<?>> parameterTypes = new ArrayList<>();
+
+            if (argsString != null && !argsString.trim().isEmpty()) {
+                Matcher argMatcher = ARG_PATTERN.matcher(argsString);
+                while (argMatcher.find()) {
+                    arguments.add(argMatcher.group().trim());
+                }
+                parameterTypes = resolveParameterTypes(arguments);
+            }
+            MethodHandle handle = findMethodHandle(methodName, parameterTypes);
+            return new MethodInvocation(handle, arguments, callerInstance);
+        } else {
+            MethodHandle handle = findMethodHandle(cleanedHandlerString, Collections.emptyList());
+            return new MethodInvocation(handle, Collections.emptyList(), callerInstance);
+        }
+    }
+
+    private void processClickHandlers(List<YogaLayoutEngine.RenderNode> renderNodes) {
+        clickableElements.clear();
+
+        for (YogaLayoutEngine.RenderNode node : renderNodes) {
+            if (node.element == null) continue;
+
+            String onClickHandlerString = node.element.getAttributeValue("onClick");
+            if (onClickHandlerString != null) {
                 try {
-                    Method handlerMethod = caller.getClass().getMethod(onClickHandler);
-
-                    ClickableRegion region = new ClickableRegion(0, currentYstack.peek() * rem, w * rem, h * rem);
-                    clickableElements.put(region, handlerMethod);
-                } catch (NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (Objects.equals(element.getName(), "div")) {
-                div(hex2rgb(colorPalette.get(bgColor[1], bgColor[2])), h, w, radius);
-            }
-            if (!element.getContent(new ContentFilter(ContentFilter.TEXT)).isEmpty()) {
-                for (Content text : element.getContent(new ContentFilter(ContentFilter.TEXT))) {
-                    analyze(text, textSize, textColor);
-                }
-            } else if (!element.getContent(new ContentFilter(ContentFilter.CDATA)).isEmpty()) {
-                for (Content cdata : element.getContent(new ContentFilter(ContentFilter.CDATA))) {
-                    analyze(cdata);
-                }
-            }
-            currentY = currentYstack.peek() + h;
-
-            currentYstack.push(0f);
-            for (Content child : element.getContent(new ContentFilter(ContentFilter.ELEMENT))) {
-                analyze(child);
-            }
-            currentY += currentYstack.peek();
-            currentYstack.pop();
-        } else if (content instanceof CDATA) {
-            String code = ((CDATA) content).getText();
-            code = code.trim().replaceAll("^\\{|}$", "");
-            String className = null;
-
-            Parent parent = content.getParent();
-            if (parent instanceof Element) {
-                className = ((Element) parent).getAttributeValue("className");
-            } else if (parent instanceof Document) {
-                className = ((Document) parent).getRootElement().getAttributeValue("className");
-            }
-
-            if (code.contains("&&")) {
-
-                try {
-                    String[] parts = code.split("\\s+&&\\s+");
-
-                    String fieldName = parts[0];
-                    String contentString = parts[1];
-
-                    Field booleanField = caller.getClass().getDeclaredField(fieldName);
-                    booleanField.setAccessible(true);
-                    boolean isVisible = (boolean) booleanField.get(caller);
-
-                    if (isVisible) {
-                        SAXBuilder saxBuilder = new SAXBuilder();
-                        if (className != null) {
-                            contentString = "<text className=\"" + className + "\">" + contentString + "</text>";
-                        } else {
-                            contentString = "<text>" + contentString + "</text>";
-                        }
-                        for (Content literal : saxBuilder.build(new StringReader(contentString)).getContent()) {
-                            analyze(literal);
-                        }
-                    }
-                } catch (NoSuchFieldException | IllegalAccessException | IOException | JDOMException e) {
-                    throw new RuntimeException(e);
-                }
-            } else if (code.contains("?") && code.contains(":")) {
-                Pattern pattern = Pattern.compile("(\\w+)\\s*\\?\\s*(.*?)\\s*:\\s*(.*)");
-                Matcher matcher = pattern.matcher(code);
-
-                if (matcher.matches()) {
-                    try {
-                        String fieldName = matcher.group(1);
-
-                        Field booleanField = caller.getClass().getDeclaredField(fieldName);
-                        booleanField.setAccessible(true);
-                        boolean isVisible = (boolean) booleanField.get(caller);
-
-                        SAXBuilder saxBuilder = new SAXBuilder();
-                        String contentString;
-
-                        String contentToWrap = isVisible ? matcher.group(2) : matcher.group(3);
-
-                        if (className != null) {
-                            contentString = "<text className=\"" + className + "\">" + contentToWrap + "</text>";
-                        } else {
-                            contentString = "<text>" + contentToWrap + "</text>";
-                        }
-
-                        System.out.println(contentString);
-
-                        for (Content literal : saxBuilder.build(new StringReader(contentString)).getContent()) {
-                            analyze(literal);
-                        }
-                    } catch (NoSuchFieldException | IllegalAccessException | IOException | JDOMException e) {
-                        throw new RuntimeException(e);
-                    }
+                    MethodInvocation invocation = parseClickHandler(onClickHandlerString, caller);
+                    ClickableRegion region = new ClickableRegion(node.x, node.y, node.width, node.height);
+                    clickableElements.put(region, invocation);
+                } catch (UnsupportedOperationException e) {
+                    System.err.println(e.getMessage());
+                } catch (Exception e) { // parseClickHandler内で発生する可能性のある例外をキャッチ
+                    System.err.println("Error parsing onClick handler '" + onClickHandlerString + "': " + e.getMessage());
                 }
             }
         }
     }
 
-    private void loop() {
+    private String preprocessCode(String code) {
+        Pattern pattern = Pattern.compile("\\{(.*?)}");
+        Matcher matcher = pattern.matcher(code);
 
-        // メインループ
-        while (!glfwWindowShouldClose(window)) {
-            String code = caller.render();
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) {
+            String innerContent = matcher.group(1);
+            String replacement;
+            if (innerContent.contains("&&") || innerContent.contains("?")) {
+                replacement = "<![CDATA[{" + innerContent + "}]]>";
+            } else {
+                try {
+                    replacement = caller.getClass().getDeclaredField(innerContent).toString();
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
-            Pattern pattern = Pattern.compile("\\{(.*?)}");
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    private List<Content> expandConditionals(List<Content> dom) {
+        List<Content> expandedDom = new ArrayList<>();
+
+        for (Content content : dom) {
+            if (content instanceof Element) {
+                expandedDom.add(expandElement((Element) content));
+            } else if (content instanceof CDATA) {
+                List<Content> expanded = expandCDATA((CDATA) content);
+                expandedDom.addAll(expanded);
+            } else {
+                expandedDom.add(content);
+            }
+        }
+
+        return expandedDom;
+    }
+
+    private Element expandElement(Element element) {
+        Element clonedElement = element.clone();
+        clonedElement.removeContent();
+
+        for (Content child : element.getContent()) {
+            if (child instanceof Element) {
+                clonedElement.addContent(expandElement((Element) child));
+            } else if (child instanceof CDATA) {
+                List<Content> expanded = expandCDATA((CDATA) child);
+                for (Content expandedContent : expanded) {
+                    clonedElement.addContent(expandedContent);
+                }
+            } else {
+                clonedElement.addContent(child.clone());
+            }
+        }
+
+        return clonedElement;
+    }
+
+    private List<Content> expandCDATA(CDATA cdata) {
+        List<Content> result = new ArrayList<>();
+        String code = cdata.getText();
+        code = code.trim().replaceAll("^\\{|}$", "");
+
+        Parent parent = cdata.getParent();
+        String className = null;
+        if (parent instanceof Element) {
+            className = ((Element) parent).getAttributeValue("className");
+        } else if (parent instanceof Document) {
+            className = ((Document) parent).getRootElement().getAttributeValue("className");
+        }
+
+        if (code.contains("&&")) {
+            try {
+                String[] parts = code.split("\\s+&&\\s+");
+                String fieldName = parts[0];
+                String contentString = parts[1];
+
+                Field booleanField = caller.getClass().getDeclaredField(fieldName);
+                booleanField.setAccessible(true);
+                boolean isVisible = (boolean) booleanField.get(caller);
+
+                if (isVisible) {
+                    SAXBuilder saxBuilder = new SAXBuilder();
+                    if (className != null) {
+                        contentString = "<text className=\"" + className + "\">" + contentString + "</text>";
+                    } else {
+                        contentString = "<text>" + contentString + "</text>";
+                    }
+                    result.addAll(saxBuilder.build(new StringReader(contentString)).getContent());
+                }
+            } catch (NoSuchFieldException | IllegalAccessException | IOException | JDOMException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (code.contains("?") && code.contains(":")) {
+            Pattern pattern = Pattern.compile("(\\w+)\\s*\\?\\s*(.*?)\\s*:\\s*(.*)");
             Matcher matcher = pattern.matcher(code);
 
-            StringBuilder result = new StringBuilder();
-            while (matcher.find()) {
-                String innerContent = matcher.group(1);
-                String replacement;
-                if (innerContent.contains("&&") || innerContent.contains("?")) {
-                    replacement = "<![CDATA[{" + innerContent + "}]]>";
-                } else {
-                    try {
-                        replacement = caller.getClass().getDeclaredField(innerContent).toString();
-                    } catch (NoSuchFieldException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+            if (matcher.matches()) {
+                try {
+                    String fieldName = matcher.group(1);
 
-                matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+                    Field booleanField = caller.getClass().getDeclaredField(fieldName);
+                    booleanField.setAccessible(true);
+                    boolean isVisible = (boolean) booleanField.get(caller);
+
+                    SAXBuilder saxBuilder = new SAXBuilder();
+                    String contentString;
+
+                    String contentToWrap = isVisible ? matcher.group(2) : matcher.group(3);
+
+                    if (className != null) {
+                        contentString = "<text className=\"" + className + "\">" + contentToWrap + "</text>";
+                    } else {
+                        contentString = "<text>" + contentToWrap + "</text>";
+                    }
+
+                    result.addAll(saxBuilder.build(new StringReader(contentString)).getContent());
+                } catch (NoSuchFieldException | IllegalAccessException | IOException | JDOMException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            matcher.appendTail(result);
+        }
+
+        return result;
+    }
+
+    private ArrayList<Long> times = new ArrayList<>();
+
+    private void loop() throws Throwable {
+        // メインループ
+        while (!glfwWindowShouldClose(window)) {
+            long startTime = System.nanoTime();
+
+            String code = caller.render();
+
+            // 変数展開と条件付きレンダリングの前処理
+            String preprocessedCode = preprocessCode(code);
 
             List<Content> dom;
             try {
-                dom = saxBuilder.build(new StringReader(result.toString())).getContent();
+                dom = saxBuilder.build(new StringReader(preprocessedCode)).getContent();
             } catch (IOException | JDOMException e) {
                 throw new RuntimeException(e);
             }
 
-            clickableElements.clear();
+            // 条件付きコンテンツの展開
+            dom = expandConditionals(dom);
 
-            int[] w = new int[1];
-            int[] h = new int[1];
+            // フレームバッファサイズの取得
             int[] fw = new int[1];
             int[] fh = new int[1];
-
-            glfwGetWindowSize(window, w, h);
-            int winWidth = w[0];
-            int winHeight = h[0];
-
             glfwGetFramebufferSize(window, fw, fh);
             fbWidth = fw[0];
             fbHeight = fh[0];
 
+            int[] w = new int[1];
+            int[] h = new int[1];
+            glfwGetWindowSize(window, w, h);
+            int winWidth = w[0];
+            int winHeight = h[0];
             float pixelRatio = (float) fbWidth / (float) winWidth;
+
+            // Yoga Layout Engineの初期化または更新
+            layoutEngine = new YogaLayoutEngine(rem, fbWidth, fbHeight, colorPalette, vg, FONT_NAME);
+
+            // レイアウトツリーの構築
+            layoutEngine.buildLayoutTree(dom);
+
+            // レイアウト計算
+            layoutEngine.calculateLayout();
+
+            // レンダリングノードの取得
+            List<YogaLayoutEngine.RenderNode> renderNodes = layoutEngine.getRenderNodes();
+
+            // クリックハンドラーの処理
+            processClickHandlers(renderNodes);
 
             // --- 描画前の初期設定 ---
             glViewport(0, 0, fbWidth, fbHeight);
@@ -419,23 +539,29 @@ public class Application {
             // --- NanoVG描画開始 ---
             nvgBeginFrame(vg, winWidth, winHeight, pixelRatio);
 
+            // 背景描画
             NVGColor color = create();
             nvgBeginPath(vg);
             nvgRect(vg, 0, 0, fbWidth, fbHeight);
             nvgFillColor(vg, nvgRGBAf((float) defaultColor.get(0) / 255, (float) defaultColor.get(1) / 255, (float) defaultColor.get(2) / 255, 1.0f, color));
             nvgFill(vg);
 
-            for (Content child : dom) {
-                analyze(child);
+            // レンダリングノードの描画
+            for (YogaLayoutEngine.RenderNode node : renderNodes) {
+                if (node.isDiv()) {
+                    renderDiv(node);
+                }
+                if (node.hasText()) {
+                    renderText(node);
+                }
             }
 
+            // クリックイベントの処理
             if (isClicked) {
-                double[] xpos = new double[1], ypos = new double[1];
-                glfwGetCursorPos(window, xpos, ypos);
-                for (Map.Entry<ClickableRegion, Method> entry : clickableElements.entrySet()) {
+                for (Map.Entry<ClickableRegion, MethodInvocation> entry : clickableElements.entrySet()) {
                     if (entry.getKey().contains((float) clickX, (float) clickY)) {
                         try {
-                            entry.getValue().invoke(caller);
+                            entry.getValue().invoke();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -451,6 +577,9 @@ public class Application {
             glfwSwapBuffers(window);
             // イベント処理
             glfwPollEvents();
+
+            long endTime = System.nanoTime();
+            times.add(endTime - startTime);
         }
     }
 
